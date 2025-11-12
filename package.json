@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "export": "node index.js export",
+    "import": "node index.js import"
   },
   "author": "",
   "license": "ISC",
