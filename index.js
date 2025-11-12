@@ -2,6 +2,7 @@ require("dotenv").config();
 const { MongoClient } = require("mongodb");
 const fs = require("fs-extra");
 const path = require("path");
+const readline = require("readline");
 
 const uri = process.env.MONGO_URI;
 const dbName = process.env.DB_NAME;
@@ -9,6 +10,21 @@ const dataDir = path.join(__dirname, "data");
 
 // Get command from command line arguments
 const command = process.argv[2];
+
+// Helper function to ask for user confirmation
+function askQuestion(query) {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  return new Promise((resolve) =>
+    rl.question(query, (answer) => {
+      rl.close();
+      resolve(answer);
+    })
+  );
+}
 
 async function exportCollections() {
   const client = new MongoClient(uri);
@@ -97,18 +113,93 @@ async function importCollections() {
   }
 }
 
+async function deleteAllDocuments() {
+  const client = new MongoClient(uri);
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+
+    console.log(
+      "\n⚠️  WARNING: This will DELETE ALL DOCUMENTS from ALL COLLECTIONS! ⚠️\n"
+    );
+    console.log(`Database: ${dbName}`);
+    console.log(`URI: ${uri.replace(/\/\/([^:]+):([^@]+)@/, "//***:***@")}\n`); // Mask credentials
+
+    // Get all collection names
+    const collections = await db.listCollections().toArray();
+    console.log(`Found ${collections.length} collections:`);
+    collections.forEach(({ name }) => console.log(`  - ${name}`));
+    console.log();
+
+    // First confirmation
+    const confirm1 = await askQuestion(
+      "Are you absolutely sure you want to DELETE ALL DOCUMENTS? Type 'YES' to continue: "
+    );
+
+    if (confirm1 !== "YES") {
+      console.log("❌ Operation cancelled.");
+      return;
+    }
+
+    // Second confirmation with database name
+    const confirm2 = await askQuestion(
+      `Type the database name '${dbName}' to confirm deletion: `
+    );
+
+    if (confirm2 !== dbName) {
+      console.log("❌ Database name mismatch. Operation cancelled.");
+      return;
+    }
+
+    // Third confirmation with random code
+    const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const confirm3 = await askQuestion(
+      `Final confirmation. Type '${randomCode}' to proceed with deletion: `
+    );
+
+    if (confirm3 !== randomCode) {
+      console.log("❌ Confirmation code mismatch. Operation cancelled.");
+      return;
+    }
+
+    console.log("\n🗑️  Starting deletion process...\n");
+
+    let totalDeleted = 0;
+    for (const { name } of collections) {
+      console.log(`Deleting all documents from collection: ${name}`);
+      const result = await db.collection(name).deleteMany({});
+      console.log(`→ Deleted ${result.deletedCount} documents\n`);
+      totalDeleted += result.deletedCount;
+    }
+
+    console.log(
+      `✅ Deletion complete! Total documents deleted: ${totalDeleted}`
+    );
+  } catch (err) {
+    console.error("❌ Error deleting documents:", err);
+  } finally {
+    await client.close();
+  }
+}
+
 // Main execution
 (async () => {
   if (command === "import") {
     await importCollections();
   } else if (command === "export") {
     await exportCollections();
+  } else if (command === "delete") {
+    await deleteAllDocuments();
   } else {
     console.log("Usage:");
-    console.log("  npm run export  - Export all collections to JSON files");
-    console.log("  npm run import  - Import JSON files to MongoDB");
+    console.log("  npm run export     - Export all collections to JSON files");
+    console.log("  npm run import     - Import JSON files to MongoDB");
+    console.log(
+      "  npm run delete - Delete all documents from all collections (DANGEROUS!)"
+    );
     console.log("\nOr use:");
     console.log("  node index.js export");
     console.log("  node index.js import");
+    console.log("  node index.js delete");
   }
 })();

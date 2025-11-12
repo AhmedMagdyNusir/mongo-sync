@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "export": "node index.js export",
-    "import": "node index.js import"
+    "import": "node index.js import",
+    "delete": "node index.js delete"
   },
   "author": "",
   "license": "ISC",
