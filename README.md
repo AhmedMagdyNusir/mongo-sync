@@ -1,6 +1,6 @@
-# MongoDB Exporter & Importer
+# Mongo Sync
 
-A simple Node.js script to export and import collections from a MongoDB database to/from JSON files.
+A simple Node.js tool to export and import collections from a MongoDB database to/from JSON files.
 
 ## Setup
 
