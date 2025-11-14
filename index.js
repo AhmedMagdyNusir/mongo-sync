@@ -8,15 +8,18 @@ const command = process.argv[2];
 // Display usage information
 function showUsage() {
   console.log("Usage:");
-  console.log("  npm run export - Export all collections to JSON files");
-  console.log("  npm run import - Import JSON files to MongoDB");
   console.log(
-    "  npm run delete - Delete all documents from all collections (DANGEROUS!)"
+    "  npm run export       - Export all collections to JSON files (Extended JSON format)"
   );
-  console.log("\nOr use:");
-  console.log("  node index.js export");
-  console.log("  node index.js import");
-  console.log("  node index.js delete");
+  console.log(
+    "  npm run export:plain - Export all collections to JSON files (plain JSON format)"
+  );
+  console.log(
+    "  npm run import       - Import collections from JSON files in the data directory"
+  );
+  console.log(
+    "  npm run delete       - Delete all documents from all collections (DANGEROUS!)"
+  );
 }
 
 // Main execution
