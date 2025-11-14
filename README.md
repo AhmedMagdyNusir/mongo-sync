@@ -41,11 +41,7 @@ npm run import
 
 This will read all JSON files from the `data/` directory and import them into the database.
 
-**Note:** The import script uses `insertMany` with `ordered: false`, which means:
-
-- It will attempt to import all documents even if some fail
-- Duplicate `_id` errors will be handled gracefully
-- You may see errors if documents already exist in the database
+**Note:** It is recommended that the database is pre-created with all the necessary indexes for each collection before performing the import to avoid performance issues or duplicates.
 
 ---
 

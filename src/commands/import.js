@@ -43,15 +43,23 @@ async function importCollections() {
       // Read JSON data from file
       const data = await fs.readJson(filePath);
 
-      if (!Array.isArray(data) || data.length === 0) {
-        console.log(`→ Skipping ${collectionName} (empty or invalid data)\n`);
+      if (!Array.isArray(data)) {
+        console.log(`→ Skipping ${collectionName} (invalid data format)\n`);
         continue;
       }
 
-      // Insert documents into MongoDB collection
+      // Get or create the collection
       const collection = db.collection(collectionName);
-      const result = await collection.insertMany(data, { ordered: false });
-      console.log(`→ Imported ${result.insertedCount} documents\n`);
+
+      if (data.length === 0) {
+        // Create empty collection by ensuring it exists
+        await db.createCollection(collectionName).catch(() => {}); // Collection might already exist, which is fine
+        console.log(`→ Created empty collection\n`);
+      } else {
+        // Insert documents into MongoDB collection
+        const result = await collection.insertMany(data, { ordered: false });
+        console.log(`→ Imported ${result.insertedCount} documents\n`);
+      }
     }
 
     logSuccess("Import complete!");
