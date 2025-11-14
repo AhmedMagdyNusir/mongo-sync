@@ -10,10 +10,15 @@ async function exportCollections() {
   try {
     const connection = await connectToDatabase();
     client = connection.client;
-    const db = connection.db;
 
     // Ensure data directory exists
     await fs.ensureDir(paths.dataDir);
+
+    // Clean data directory - remove old exports
+    console.log("Cleaning previous export data...\n");
+    await fs.emptyDir(paths.dataDir);
+
+    const db = connection.db;
 
     // Get all collection names
     const collections = await getAllCollections(db);
