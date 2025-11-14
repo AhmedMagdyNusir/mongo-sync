@@ -1,5 +1,5 @@
 const { connectToDatabase, getAllCollections } = require("../utils/database");
-const { logSuccess, logError } = require("../utils/logger");
+const { logSuccess, logError, logWarning } = require("../utils/logger");
 const { askQuestion } = require("../utils/input");
 const config = require("../config/database");
 
@@ -11,9 +11,8 @@ async function deleteAllDocuments() {
     client = connection.client;
     const db = connection.db;
 
-    console.log(
-      "\n⚠️ WARNING: This will DELETE ALL DOCUMENTS from ALL COLLECTIONS! ⚠️\n"
-    );
+    console.log();
+    logWarning("WARNING: This will DELETE ALL DOCUMENTS from ALL COLLECTIONS!");
     console.log(`Database: ${config.dbName}`);
     console.log(
       `URI: ${config.uri.replace(/\/\/([^:]+):([^@]+)@/, "//***:***@")}\n`
@@ -22,7 +21,7 @@ async function deleteAllDocuments() {
     // Get all collection names
     const collections = await getAllCollections(db);
     console.log(`Found ${collections.length} collections:`);
-    collections.forEach(({ name }) => console.log(`  - ${name}`));
+    collections.forEach(({ name }) => console.log(` - ${name}`));
     console.log();
 
     // First confirmation
@@ -56,7 +55,7 @@ async function deleteAllDocuments() {
       return;
     }
 
-    console.log("\n🗑️ Starting deletion process...\n");
+    console.log("\n🗑️  Starting deletion process...\n");
 
     let totalDeleted = 0;
     for (const { name } of collections) {

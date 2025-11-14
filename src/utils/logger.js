@@ -8,7 +8,7 @@ function logError(message, error = null) {
 }
 
 function logWarning(message) {
-  console.log(`⚠️ ${message}`);
+  console.log(`⚠️  ${message}`);
 }
 
 module.exports = { logSuccess, logError, logWarning };
