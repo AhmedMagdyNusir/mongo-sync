@@ -1,22 +1,23 @@
 const { connectToDatabase, getAllCollections } = require("../utils/database");
 const { logSuccess, logError, logWarning } = require("../utils/logger");
 const { askQuestion } = require("../utils/input");
+const { confirmDatabaseOperation } = require("../utils/confirmation");
 const config = require("../config/database");
 
 async function deleteAllDocuments() {
   let client;
 
   try {
+    // Show database info and confirm with user
+    const confirmed = await confirmDatabaseOperation("deleting from");
+    if (!confirmed) return;
+
     const connection = await connectToDatabase();
     client = connection.client;
     const db = connection.db;
 
-    console.log();
     logWarning("WARNING: This will DELETE ALL DOCUMENTS from ALL COLLECTIONS!");
-    console.log(`Database: ${config.dbName}`);
-    console.log(
-      `URI: ${config.uri.replace(/\/\/([^:]+):([^@]+)@/, "//***:***@")}\n`
-    ); // Mask credentials
+    console.log();
 
     // Get all collection names
     const collections = await getAllCollections(db);

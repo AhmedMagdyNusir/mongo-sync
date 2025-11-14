@@ -7,6 +7,7 @@ const config = require("../config/database");
  */
 async function connectToDatabase() {
   const client = new MongoClient(config.uri);
+  console.log("\nConnecting to database...\n");
   await client.connect();
   const db = client.db(config.dbName);
   return { client, db };

@@ -2,12 +2,17 @@ const fs = require("fs-extra");
 const path = require("path");
 const { connectToDatabase } = require("../utils/database");
 const { logSuccess, logError, logWarning } = require("../utils/logger");
+const { confirmDatabaseOperation } = require("../utils/confirmation");
 const paths = require("../config/paths");
 
 async function importCollections() {
   let client;
 
   try {
+    // Show database info and confirm with user
+    const confirmed = await confirmDatabaseOperation("importing");
+    if (!confirmed) return;
+
     const connection = await connectToDatabase();
     client = connection.client;
     const db = connection.db;
