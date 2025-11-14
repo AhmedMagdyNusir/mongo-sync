@@ -3,6 +3,7 @@ const path = require("path");
 const { connectToDatabase } = require("../utils/database");
 const { logSuccess, logError, logWarning } = require("../utils/logger");
 const { confirmDatabaseOperation } = require("../utils/confirmation");
+const { fromExtendedJSON } = require("../utils/serialization");
 const paths = require("../config/paths");
 
 async function importCollections() {
@@ -41,12 +42,15 @@ async function importCollections() {
       console.log(`Importing collection: ${collectionName}`);
 
       // Read JSON data from file
-      const data = await fs.readJson(filePath);
+      const rawData = await fs.readJson(filePath);
 
-      if (!Array.isArray(data)) {
+      if (!Array.isArray(rawData)) {
         console.log(`→ Skipping ${collectionName} (invalid data format)\n`);
         continue;
       }
+
+      // Convert Extended JSON format to native MongoDB types
+      const data = rawData.map((doc) => fromExtendedJSON(doc));
 
       // Get or create the collection
       const collection = db.collection(collectionName);

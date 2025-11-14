@@ -21,13 +21,30 @@ DB_NAME=your_database_name
 
 ### Export Collections
 
-Export all collections to JSON files:
+Export all collections to JSON files in **Extended JSON format** (MongoDB format, compatible with MongoDB Compass):
 
 ```bash
 npm run export
 ```
 
-All collections will be exported to the `data/` directory as individual JSON files.
+This will export data in Extended JSON format with proper MongoDB types:
+
+- ObjectIds are exported as `{ "$oid": "..." }`
+- Dates are exported as `{ "$date": "..." }`
+
+This format is **recommended** as it preserves MongoDB data types and is fully compatible with imports.
+
+#### Export in Plain JSON Format
+
+If you need plain JSON without MongoDB type annotations:
+
+```bash
+npm run export:plain
+```
+
+**Note:** Plain format may lose type information (ObjectIds and Dates become strings), which could cause issues during import.
+
+All collections will be exported to the `data` directory as individual JSON files.
 
 ---
 
@@ -39,9 +56,15 @@ Import JSON files back into MongoDB:
 npm run import
 ```
 
-This will read all JSON files from the `data/` directory and import them into the database.
+This will read all JSON files from the `data` directory and import them into the database.
 
-**Note:** It is recommended that the database is pre-created with all the necessary indexes for each collection before performing the import to avoid performance issues or duplicates.
+**Use Extended JSON format:**
+
+- The import tool supports both **Extended JSON format** (with `$oid` and `$date`) and plain JSON format.
+- **Extended JSON format is recommended** to ensure proper data types are preserved (ObjectIds, Dates, etc.).
+- If you're importing data exported with `npm run export`, the data will automatically be converted to proper MongoDB types.
+
+> It is recommended that the database is pre-created with all the necessary indexes for each collection before performing the import to avoid performance issues or duplicates.
 
 ---
 

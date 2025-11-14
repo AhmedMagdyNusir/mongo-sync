@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "export": "node index.js export",
+    "export:plain": "node index.js export --plain",
     "import": "node index.js import",
     "delete": "node index.js delete"
   },
