@@ -9,15 +9,25 @@ const config = require("../config/database");
 async function confirmDatabaseOperation(operation) {
   // Extract host from URI (excluding credentials for cloud connections)
   let host = "Unknown";
-  const uriMatch = config.uri.match(/mongodb(?:\+srv)?:\/\/([^/]+)/);
+
+  // Match MongoDB URI and extract host without credentials
+  // Pattern: mongodb[+srv]://[username:password@]host[/database][?options]
+  const uriMatch = config.uri.match(/mongodb(?:\+srv)?:\/\/(.+)/);
 
   if (uriMatch) {
-    const fullHost = uriMatch[1];
-    // Check if credentials are present (format: username:password@host)
-    const hostWithoutCredentials = fullHost.includes("@")
-      ? fullHost.split("@")[1]
-      : fullHost;
-    host = hostWithoutCredentials;
+    const afterProtocol = uriMatch[1];
+    // Find the last @ symbol (separates credentials from host)
+    const lastAtIndex = afterProtocol.lastIndexOf("@");
+
+    if (lastAtIndex !== -1) {
+      // Has credentials, extract host after the last @
+      const hostPart = afterProtocol.substring(lastAtIndex + 1);
+      // Remove database name and query params (everything after / or ?)
+      host = hostPart.split(/[/?]/)[0];
+    } else {
+      // No credentials, extract host directly
+      host = afterProtocol.split(/[/?]/)[0];
+    }
   }
 
   // Display connection information
