@@ -18,18 +18,14 @@ async function importCollections() {
     client = connection.client;
     const db = connection.db;
 
-    // Check if data directory exists
-    if (!(await fs.pathExists(paths.dataDir))) {
-      logError(`Data directory not found: ${paths.dataDir}`);
-      return;
-    }
+    await fs.ensureDir(paths.importsDir);
 
-    // Get all JSON files from the data directory
-    const files = await fs.readdir(paths.dataDir);
+    // Get all JSON files from the imports directory
+    const files = await fs.readdir(paths.importsDir);
     const jsonFiles = files.filter((file) => file.endsWith(".json"));
 
     if (jsonFiles.length === 0) {
-      logWarning("No JSON files found in the data directory.");
+      logWarning("No JSON files found in the imports directory.");
       return;
     }
 
@@ -37,7 +33,7 @@ async function importCollections() {
 
     for (const file of jsonFiles) {
       const collectionName = path.basename(file, ".json");
-      const filePath = path.join(paths.dataDir, file);
+      const filePath = path.join(paths.importsDir, file);
 
       console.log(`Importing collection: ${collectionName}`);
 

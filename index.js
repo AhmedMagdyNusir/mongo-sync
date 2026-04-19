@@ -15,7 +15,7 @@ function showUsage() {
     "  npm run export:plain - Export all collections to JSON files (plain JSON format)"
   );
   console.log(
-    "  npm run import       - Import collections from JSON files in the data directory"
+    "  npm run import       - Import collections from JSON files in the imports directory"
   );
   console.log(
     "  npm run delete       - Delete all documents from all collections (DANGEROUS!)"

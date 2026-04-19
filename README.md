@@ -44,7 +44,7 @@ npm run export:plain
 
 **Note:** Plain format may lose type information (ObjectIds and Dates become strings), which could cause issues during import.
 
-All collections will be exported to the `data` directory as individual JSON files.
+Each export creates a new folder under `exports/` named `<database-name>_<YYYY-MM-DD_HH-MM-SS>/` (for example `mydb_2026-04-19_10-30-00/`). Collection data is written as individual JSON files inside that folder. Previous exports are kept; each run adds a new timestamped directory.
 
 ---
 
@@ -56,13 +56,12 @@ Import JSON files back into MongoDB:
 npm run import
 ```
 
-This will read all JSON files from the `data` directory and import them into the database.
+This reads all JSON files from the **`imports/`** directory (at the project root) and imports them into the database. Copy the files you want to import into `imports/` (for example from a folder under `exports/`). The `imports/` directory is created automatically if it does not exist.
 
 **Use Extended JSON format:**
 
 - The import tool supports both **Extended JSON format** (with `$oid` and `$date`) and plain JSON format.
 - **Extended JSON format is recommended** to ensure proper data types are preserved (ObjectIds, Dates, etc.).
-- If you're importing data exported with `npm run export`, the data will automatically be converted to proper MongoDB types.
 
 > It is recommended that the database is pre-created with all the necessary indexes for each collection before performing the import to avoid performance issues or duplicates.
 

@@ -5,6 +5,7 @@ const { logSuccess, logError } = require("../utils/logger");
 const { confirmDatabaseOperation } = require("../utils/confirmation");
 const { toExtendedJSON } = require("../utils/serialization");
 const paths = require("../config/paths");
+const config = require("../config/database");
 
 async function exportCollections() {
   let client;
@@ -25,12 +26,8 @@ async function exportCollections() {
     const connection = await connectToDatabase();
     client = connection.client;
 
-    // Ensure data directory exists
-    await fs.ensureDir(paths.dataDir);
-
-    // Clean data directory - remove old exports
-    console.log("Cleaning previous export data...\n");
-    await fs.emptyDir(paths.dataDir);
+    const exportDir = paths.getExportDir(config.dbName);
+    await fs.ensureDir(exportDir);
 
     const db = connection.db;
 
@@ -48,11 +45,11 @@ async function exportCollections() {
         ? data
         : data.map((doc) => toExtendedJSON(doc));
 
-      const filePath = path.join(paths.dataDir, `${name}.json`);
+      const filePath = path.join(exportDir, `${name}.json`);
       await fs.writeJson(filePath, exportData, { spaces: 2 });
     }
 
-    logSuccess(`Export complete! Files saved in: ${paths.dataDir}`);
+    logSuccess(`Export complete! Files saved in: ${exportDir}`);
   } catch (err) {
     logError("Error exporting collections:", err);
   } finally {
